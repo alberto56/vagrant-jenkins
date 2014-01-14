@@ -11,6 +11,7 @@ For an initial deployment:
 For an incremental deployment, if you've already deployed a previous version of this, and then you want to update this:
 
  * In the `manifests` directory, type `librarian-puppet update`
+ * Type `vagrant reload` when in the root directory (`vagrant-jenkins`)
  * Type `vagrant provision` when in the root directory (`vagrant-jenkins`)
  * You might need to follow further instructions on-screen.
  
