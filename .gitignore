@@ -1,0 +1,6 @@
+.DS_Store
+.vagrant
+manifests/.librarian
+manifests/.tmp
+manifests/*lock
+manifests/modules
