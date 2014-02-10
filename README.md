@@ -10,7 +10,7 @@ For an initial deployment:
     librarian-puppet install
     cd ..
     vagrant up
- 
+
 You might have to wait for about an hour while all the relevant files are downloaded. Once the base box is already installed, it will take less time.
 
 Once your box is running, and assuming no other applications (including other instances of the same box code) use port 8082, you will be able to access Jenkins at the address http://localhost:8082
