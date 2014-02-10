@@ -6,6 +6,7 @@ For an initial deployment:
  * Install Librarian-Puppet on your computer
  * Type the following commands, from the root of this directory (`vagrant-jenkins`):
 
+
     cd manifests
     librarian-puppet install
     cd ..
@@ -30,6 +31,7 @@ Note that you can also use this project without vagrant, with puppet in a client
  * Install CentOS 6.x on a server.
  * Install Puppet and Librarian-Puppet
  * Run the following commands:
+
 
     mkdir -p /etc/puppet/manifests
     cd /etc/puppet/manifests
