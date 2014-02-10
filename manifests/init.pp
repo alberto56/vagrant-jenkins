@@ -11,8 +11,8 @@ file { '/etc/motd':
 
 include jenkins
 
-# don't use a firewall, see http://stackoverflow.com/questions/5984217
-service { iptables: ensure => stopped }
+# Adapt the firewall to Jenkins traffic
+jenkins::firewall { 8080: }
 
 # Install git and dependencies, see
 # https://github.com/jenkinsci/puppet-jenkins/issues/78
