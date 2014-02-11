@@ -3,6 +3,7 @@ This is meant to be used with Vagrant and Virtual Box to set up a Jenkins server
 For an initial deployment:
 
  * Install Vagrant on your computer
+ * Install Puppet on your computer
  * Install Librarian-Puppet on your computer
 
 Type the following commands, from the root of this directory (`vagrant-jenkins`):

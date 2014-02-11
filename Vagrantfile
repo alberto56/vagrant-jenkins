@@ -18,6 +18,7 @@ Vagrant.configure("2") do |config|
   # within the machine from a port on the host machine. In the example below,
   # accessing "localhost:8080" will access port 80 on the guest machine.
   config.vm.network :forwarded_port, guest: 8080, host: 8082
+  config.vm.network :forwarded_port, guest: 80, host: 8083
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
@@ -110,4 +111,10 @@ Vagrant.configure("2") do |config|
   # chef-validator, unless you changed the configuration.
   #
   #   chef.validation_client_name = "ORGNAME-validator"
+
+  # See http://stackoverflow.com/questions/11955525
+  Vagrant::Config.run do |config|
+    config.ssh.private_key_path = "~/.ssh/id_rsa"
+    config.ssh.forward_agent = true
+  end
 end
