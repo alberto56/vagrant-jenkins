@@ -17,3 +17,11 @@ mod "apt",
 
 mod "stdlib",
   :git => "git://github.com/puppetlabs/puppetlabs-stdlib.git"
+
+mod 'puppetlabs/git'
+
+mod 'erikwebb/drush'
+
+mod 'puppetlabs/apache'
+mod 'puppetlabs/mysql'
+mod 'thias/php'

@@ -4,12 +4,55 @@ group { "puppet":
 
 File { owner => 0, group => 0, mode => 0644 }
 
+# see https://wiki.jenkins-ci.org/display/JENKINS/Log+Parser+Plugin
+file {'testfile':
+  path    => '/tmp/logparser',
+  ensure  => present,
+  mode    => 0644,
+  content => "ok /not really/
+
+# match line starting with 'error ', case-insensitive
+error /(?i)^error /
+
+# match line containing '[error]', case-insensitive
+error /(?i)\[error\]/
+
+# list of warnings here...
+warning /[Ww]arning/
+warning /WARNING/
+
+# create a quick access link to lines in the report containing 'INFO'
+info /INFO/
+
+# each line containing 'BUILD' represents the start of a section for grouping errors and warnings found after the line.
+# also creates a quick access link.
+start /BUILD/",
+}
+
 file { '/etc/motd':
   content => "Welcome to your NEW Vagrant-built virtual machine!
               Managed by Puppet.\n"
 }
 
 include jenkins
+include git
+include drush
+class { 'apache':  }
+
+php::ini { '/etc/php.ini':
+  display_errors => 'On',
+  memory_limit   => '256M',
+}
+include php::cli
+php::module { [ 'mbstring', 'apc', 'pdo', 'gd' ]: }
+class { 'php::mod_php5': inifile => '/etc/php.ini' }
+
+# See https://ask.puppetlabs.com/question/3516
+# Specifying a password here causes permissions problems
+# with PHP.
+# See README.md on how to change the password
+class { '::mysql::server':
+}
 
 # don't use a firewall, see http://stackoverflow.com/questions/5984217
 service { iptables: ensure => stopped }
@@ -17,6 +60,7 @@ service { iptables: ensure => stopped }
 # Install git and dependencies, see
 # https://github.com/jenkinsci/puppet-jenkins/issues/78
 jenkins::plugin { 'git': }
+jenkins::plugin { 'log-parser': }
 jenkins::plugin { 'ssh-credentials': }
 jenkins::plugin { 'scm-api': }
 jenkins::plugin { 'credentials': }
