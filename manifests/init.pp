@@ -17,6 +17,9 @@ error /(?i)^error /
 # match line containing '[error]', case-insensitive
 error /(?i)\[error\]/
 
+# match line beginning with '[Fail]', case-insensitive
+error /(?i)^fail/
+
 # list of warnings here...
 warning /[Ww]arning/
 warning /WARNING/

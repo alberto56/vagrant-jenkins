@@ -104,7 +104,7 @@ Add the following:
 
 Finally, for clean URLs to work, I want to eventually automate this in puppet but for now could not figure out how. I apply this manually:
 
-    sudo vi /etc/httpd/conf/httpd.conf
+    sudo vi `
 
 And, then, change `AllowOverride None` to `AllowOverride All`.
 
@@ -129,4 +129,17 @@ Enable Simpletest and run your test suite. If you are using a [site deployment m
     drush en simpletest -y
     drush test-run mysite_deploy
 
-Once you get that working, you can add an "Execute shell" step to your Jenkins job via the UI. However, even if your test fails, Jenkins might not pick up on it, as [documented here](https://github.com/drush-ops/drush/issues/212). I have included the Jenkins [Log Parser plugin](https://wiki.jenkins-ci.org/display/JENKINS/Log+Parser+Plugin) in this distribution. You should set it up by visiting http://localhost:8082/configure, adding a Console Output Parsing rule, with the description "Main parsing file" and the File "/tmp/logparser".
+Once you get that working, you can add an "Execute shell" step to your Jenkins job via the UI. However, even if your test fails, Jenkins might not pick up on it, as [documented here](https://github.com/drush-ops/drush/issues/212). This is why I have included the Jenkins [Log Parser plugin](https://wiki.jenkins-ci.org/display/JENKINS/Log+Parser+Plugin) in this distribution to look for output patterns in addition to exit codes in order to determine the status of a build.
+
+You should set it up by visiting http://localhost:8082/configure, adding a Console Output Parsing rule, with the description "Main parsing file" and the File "/tmp/logparser".
+
+Now, configure your job by adding the Console Output (build log) parsing post-build action, mark build failed as error, and save.
+
+Note that if you need more verbose results on the command line test run, for example if tests are working on your dev machine but not on jenkins, you can run, from the command line or from the jenkins job:
+
+    php scripts/run-tests.sh --verbose mysite_deploy
+
+Troubleshooting
+---------------
+
+ * If you are getting a failing test on jenkins, and the same tests pass locally, check the verbose messages at /path/to/drupal/sites/default/files/simpletest/verbose/*. If you see something like a MySQL error, please make sure `AllowOverride All` is set in your `/etc/httpd/conf/httpd.conf`; also make sure your `/etc/httpd/conf.d/mysite.conf` file has not been deleted during a provision (see above), and restart apache.
