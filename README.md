@@ -1,4 +1,11 @@
-This is meant to be used with Vagrant and Virtual Box to set up a Jenkins server running on CentOS 6.x.
+VAGRANT-JENKINS
+===============
+
+By [Albert Albala (alberto56)](https://drupal.org/user/245583).
+
+*A quick, automated way to deploy a Jenkins server tuned specifically for Drupal developers; Uses puppet to configure the server; Can be used with or without vagrant to provision any server (whether or not it's a VM on your local machine). The Jenkins server then created will be able to monitor your Drupal sites' code. Please see [Dcycle project](http://dcycleproject.org) for some best practices.*
+
+This is meant to be used with Vagrant and Virtual Box to set up a Jenkins server running on CentOS 6.x. This has been tested with Mac OS X as a host machine, but it should be possible to run this on any host system which supports Vagrant, VirtualBox, Puppet and Librarian Puppet.
 
 For an initial deployment:
 
@@ -15,9 +22,9 @@ Type the following commands, from the root of this directory (`vagrant-jenkins`)
 
 You might have to wait for about an hour while all the relevant files are downloaded. Once the base box is already installed, it will take less time.
 
-Once your box is running, and assuming no other applications (including other instances of the same box code) use port 8082, you will be able to access Jenkins at the address http://localhost:8082
+Once your box is running, and assuming no other applications (including other instances of the same box code) use port 8082, you will be able to access the guest's Jenkins at the address http://localhost:8082, and the guest's webserver at http://localhost:8083.
 
-For an incremental deployment, if you've already deployed a previous version of this, and then you want to update this:
+For an incremental deployment (if you've already deployed a previous version of this, which you want to update):
 
     cd manifests
     librarian-puppet update
@@ -27,10 +34,14 @@ For an incremental deployment, if you've already deployed a previous version of 
 
 You might need to follow further instructions on-screen.
 
+You can then log into your box:
+
+    vagrant ssh
+
 Note that you can also use this project without vagrant, with puppet in a client-server or standalone architecture:
 
  * Install CentOS 6.x on a server.
- * Install Puppet and Librarian-Puppet
+ * Install Git, Puppet and Librarian-Puppet on said server.
 
 Then, run the following commands:
 
@@ -49,7 +60,7 @@ Notes
 
  * This is a work in progress, make sure you are familiar with [the project issue queue](https://github.com/alberto56/vagrant-jenkins/issues) to avoid frustration.
 
- * I can't get [SSH agent forwarding](https://github.com/alberto56/vagrant-jenkins/issues/5) to work, so for now I am creating an SSH key pair on my machine.
+ * I can't get [SSH agent forwarding](https://github.com/alberto56/vagrant-jenkins/issues/5) to work, so for now I am creating an SSH key pair on my guest.
 
  * If you are having trouble connecting Jenkins and Git, [read this blog post](http://dcycleproject.org/blog/51).
 
@@ -59,8 +70,12 @@ It is a good idea to change the MySQL root password. You can call this:
 
 If that does not work you might have to follow the instructions [here](http://www.cyberciti.biz/tips/recover-mysql-root-password.html), using `sudo` for commands which give you an access denied.
 
+Note finally that by default Jenkins is not using a password; *you will want to change this if your machine is publicly accessible*.
+
 Setting up a Drupal project
 ---------------------------
+
+To set up a Drupal project on Jenkins:
 
 Visit http://localhost:8082
 
@@ -81,7 +96,11 @@ Create your database and install Drupal:
     echo 'create database mysite'|mysql -uroot -pprincess
     drush si --db-url=mysql://root:princess@localhost/mysite
 
-Make a local domain to the *guest system* in `etc/hosts`
+You can now exit the jenkins user:
+
+    exit
+
+Make a local domain in the *guest system*'s `etc/hosts`
 
     sudo vi /etc/hosts
 
@@ -91,22 +110,12 @@ Add the following line
 
 Add virtual hosts:
 
-    sudo vi /etc/httpd/conf.d/mysite.conf
-
-Add the following:
-
-    <VirtualHost *:80>
-         DocumentRoot /var/lib/jenkins/jobs/myjob/workspace
-         ServerName mysite.jenkins
-    </VirtualHost>
-
-(For a reason I don't understand, this configuration gets erased sometimes when re-provisioning from puppet).
-
-Finally, for clean URLs to work, I want to eventually automate this in puppet but for now could not figure out how. I apply this manually:
-
-    sudo vi `
-
-And, then, change `AllowOverride None` to `AllowOverride All`.
+    sudo su
+    SITE=mysite
+    echo '<VirtualHost *:80>' >> /var/lib/jenkins/conf.d/$SITE.conf
+    echo "     DocumentRoot /var/lib/jenkins/jobs/$SITE/workspace" >> /var/lib/jenkins/conf.d/$SITE.conf
+    echo "     ServerName $SITE.jenkins" >> /var/lib/jenkins/conf.d/$SITE.conf
+    echo '</VirtualHost>' >> /var/lib/jenkins/conf.d/$SITE.conf
 
 Now restart apache on the guest
 
@@ -129,9 +138,9 @@ Enable Simpletest and run your test suite. If you are using a [site deployment m
     drush en simpletest -y
     drush test-run mysite_deploy
 
-Once you get that working, you can add an "Execute shell" step to your Jenkins job via the UI. However, even if your test fails, Jenkins might not pick up on it, as [documented here](https://github.com/drush-ops/drush/issues/212). This is why I have included the Jenkins [Log Parser plugin](https://wiki.jenkins-ci.org/display/JENKINS/Log+Parser+Plugin) in this distribution to look for output patterns in addition to exit codes in order to determine the status of a build.
+Once you get that working, you can add an "Execute shell" step to your Jenkins job via the UI. However, even if your test fails, Jenkins might still mark your job as successful, as [documented here](https://github.com/drush-ops/drush/issues/212). This is why I have included the Jenkins [Log Parser plugin](https://wiki.jenkins-ci.org/display/JENKINS/Log+Parser+Plugin) in this distribution to look for output patterns in addition to exit codes in order to determine the status of a build.
 
-You should set it up by visiting http://localhost:8082/configure, adding a Console Output Parsing rule, with the description "Main parsing file" and the File "/tmp/logparser".
+You should set it up by visiting http://localhost:8082/configure, adding a Console Output Parsing rule, with the description "Main parsing file" and the File "/tmp/logparser" (these should have been created by puppet).
 
 Now, configure your job by adding the Console Output (build log) parsing post-build action, mark build failed as error, and save.
 
@@ -142,4 +151,11 @@ Note that if you need more verbose results on the command line test run, for exa
 Troubleshooting
 ---------------
 
- * If you are getting a failing test on jenkins, and the same tests pass locally, check the verbose messages at /path/to/drupal/sites/default/files/simpletest/verbose/*. If you see something like a MySQL error, please make sure `AllowOverride All` is set in your `/etc/httpd/conf/httpd.conf`; also make sure your `/etc/httpd/conf.d/mysite.conf` file has not been deleted during a provision (see above), and restart apache.
+ * Please see the [issue queue](https://github.com/alberto56/vagrant-jenkins/issues) if you are having troubles, and add a new issue if you don't find what you are looking for.
+
+Fun add-ons
+-----------
+
+Here are some things I'd like to add to puppet but haven't gotten around to yet:
+
+ * [Phantomjs for screenshots](http://www.sameerhalai.com/blog/how-to-install-phantomjs-on-a-centos-server/), this allows your Jenkins job to take a screenshot of your website's home page as viewed by an anonymous user, and save the artifact for later use. This can be a nice visual incentive for convincing your co-workers, boss or client to adopt continuous integration.

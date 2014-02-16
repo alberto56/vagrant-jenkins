@@ -40,7 +40,32 @@ file { '/etc/motd':
 include jenkins
 include git
 include drush
-class { 'apache':  }
+include imagemagick
+class { 'apache':
+  notify => [
+    exec['clean_urls_for_drupal'],
+    exec['allow_jenkins_virtual_hosts'],
+  ],
+}
+
+file { "/var/lib/jenkins/conf.d":
+  ensure => "directory",
+}
+
+# make some changes to /etc/httpd/conf/httpd.conf
+exec { "clean_urls_for_drupal":
+  command => "/bin/sed -i 's/AllowOverride None/AllowOverride All/g' /etc/httpd/conf/httpd.conf; sudo apachectl restart",
+}
+
+# /etc/httpd/conf.d/*.conf gets deleted on every provision,
+# so we put our virtual hosts elsewhere, specifically at
+# /var/lib/jenkins/conf.d/*.conf. I could not get the conditional to
+# work with exec, so I'm including the condition (via ||) directly
+# in the command. This command adds the line only if it does not already
+# exist.
+exec { "allow_jenkins_virtual_hosts":
+  command => '/bin/grep "Include \"\/var\/lib\/jenkins\/conf\.d\/\*.conf\"" /etc/httpd/conf/httpd.conf || /bin/echo "Include \"/var/lib/jenkins/conf.d/*.conf\"" >> /etc/httpd/conf/httpd.conf; sudo apachectl restart',
+}
 
 php::ini { '/etc/php.ini':
   display_errors => 'On',
