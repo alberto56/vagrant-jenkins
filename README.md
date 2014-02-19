@@ -38,22 +38,34 @@ You can then log into your box:
 
     vagrant ssh
 
-Note that you can also use this project without vagrant, with puppet in a client-server or standalone architecture:
+Provisioning remote VMs (without Vagrant)
+-----------------------------------------
 
- * Install CentOS 6.x on a server.
- * Install Git, Puppet and Librarian-Puppet on said server.
+Now that we have a relatively viable recipe to install Jenkins, I tried provisioning a remote VM hosted on [Digital Ocean](https://www.digitalocean.com). To do that I first created a CentOS VM, and then, on it, I enabled the puppetlabs repo and installed puppet:
 
-Then, run the following commands:
+    sudo rpm -ivh https://yum.puppetlabs.com/el/6/products/x86_64/puppetlabs-release-6-7.noarch.rpm
+    sudo yum install puppet
 
-    mkdir -p /etc/puppet/manifests
-    cd /etc/puppet/manifests
+Now, I downloaded my [Vagrant-Puppet scripts](https://github.com/alberto56/vagrant-jenkins) and ran them:
+
+    cd
+    yum install git
     git clone https://github.com/alberto56/vagrant-jenkins.git
-    cd vagrant-jenkins/manifests
+    cd ~/vagrant-jenkins/manifests/
+    gem install librarian-puppet
     librarian-puppet install
 
-Then, for an initial or incremental deployment, type
-    
-    puppet apply --verbose /etc/puppet/manifests/vagrant-jenkins/manifests/init.pp
+Now add the module path to your puppet conf:
+
+    vi /etc/puppet/puppet.conf
+
+And add the following line to main:
+
+    modulepath = /root/vagrant-jenkins/manifests/modules
+
+Now it should be possible to apply the puppet manifest:
+
+    puppet apply --verbose ~/vagrant-jenkins/manifests/init.pp
 
 Notes
 -----
