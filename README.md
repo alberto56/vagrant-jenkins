@@ -73,7 +73,12 @@ Notes
 
  * This is a work in progress, make sure you are familiar with [the project issue queue](https://github.com/alberto56/vagrant-jenkins/issues) to avoid frustration.
 
- * I can't get [SSH agent forwarding](https://github.com/alberto56/vagrant-jenkins/issues/5) to work, so for now I am creating an SSH key pair on my guest.
+ * I can't get [SSH agent forwarding](https://github.com/alberto56/vagrant-jenkins/issues/5) to work, so for now I am creating an SSH key pair on my guest. To do this
+
+    sudo su -s /bin/bash jenkins # login as jenkins user
+    ssh-keygen -t rsa -C "jenkins@example.com" # generate ssh key pair
+    # press enter to all following questions
+    cat ~/.ssh/id_rsa.pub # this is your public key
 
  * If you are having trouble connecting Jenkins and Git, [read this blog post](http://dcycleproject.org/blog/51).
 
