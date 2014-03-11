@@ -138,7 +138,7 @@ Add virtual hosts:
     sudo su
     SITE=mysite
     echo '<VirtualHost *:80>' >> /var/lib/jenkins/conf.d/$SITE.conf
-    echo "     DocumentRoot /var/lib/jenkins/jobs/$SITE/workspace" >> /var/lib/jenkins/conf.d/$SITE.conf
+    echo "     DocumentRoot /var/lib/jenkins/workspace/$SITE" >> /var/lib/jenkins/conf.d/$SITE.conf
     echo "     ServerName $SITE.jenkins" >> /var/lib/jenkins/conf.d/$SITE.conf
     echo '</VirtualHost>' >> /var/lib/jenkins/conf.d/$SITE.conf
 
