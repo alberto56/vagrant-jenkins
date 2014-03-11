@@ -73,7 +73,9 @@ Notes
 
  * This is a work in progress, make sure you are familiar with [the project issue queue](https://github.com/alberto56/vagrant-jenkins/issues) to avoid frustration.
 
- * I can't get [SSH agent forwarding](https://github.com/alberto56/vagrant-jenkins/issues/5) to work, so for now I am creating an SSH key pair on my guest. To do this
+ * I can't get [SSH agent forwarding](https://github.com/alberto56/vagrant-jenkins/issues/5) to work, so for now I am creating an SSH key pair on my guest.
+
+To do this
 
     sudo su -s /bin/bash jenkins # login as jenkins user
     ssh-keygen -t rsa -C "jenkins@example.com" # generate ssh key pair
