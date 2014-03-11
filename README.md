@@ -75,8 +75,9 @@ Notes
 
  * I can't get [SSH agent forwarding](https://github.com/alberto56/vagrant-jenkins/issues/5) to work, so for now I am creating an SSH key pair on my guest.
 
-To do this
+To do this:
 
+    vagrant ssh # log into vagrant box
     sudo su -s /bin/bash jenkins # login as jenkins user
     ssh-keygen -t rsa -C "jenkins@example.com" # generate ssh key pair
     # press enter to all following questions
