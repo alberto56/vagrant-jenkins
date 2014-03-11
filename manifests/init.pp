@@ -72,7 +72,8 @@ php::ini { '/etc/php.ini':
   memory_limit   => '256M',
 }
 include php::cli
-php::module { [ 'mbstring', 'apc', 'pdo', 'gd' ]: }
+# see https://drupal.org/node/881098 for xml
+php::module { [ 'mbstring', 'apc', 'pdo', 'gd', 'xml' ]: }
 class { 'php::mod_php5': inifile => '/etc/php.ini' }
 
 # See https://ask.puppetlabs.com/question/3516

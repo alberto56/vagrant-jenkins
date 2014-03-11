@@ -89,6 +89,10 @@ It is a good idea to change the MySQL root password. You can call this:
 
     mysqladmin -u root -p'CHANGEME' password 'princess'
 
+In my tests the mysql root password is sometimes empty, in which case the following might work:
+
+    mysqladmin -u root password 'princess'
+
 If that does not work you might have to follow the instructions [here](http://www.cyberciti.biz/tips/recover-mysql-root-password.html), using `sudo` for commands which give you an access denied.
 
 Note finally that by default Jenkins is not using a password; *you will want to change this if your machine is publicly accessible*.
