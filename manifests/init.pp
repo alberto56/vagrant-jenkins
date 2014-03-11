@@ -88,6 +88,9 @@ service { iptables: ensure => stopped }
 # Install git and dependencies, see
 # https://github.com/jenkinsci/puppet-jenkins/issues/78
 jenkins::plugin { 'git': }
+# plot seems to be the best way to generate generic graphs
+# see http://jenkinsrecip.es/add-custom-graphs-to-a-jenkins-ci-job/
+jenkins::plugin { 'plot': }
 jenkins::plugin { 'log-parser': }
 jenkins::plugin { 'ssh-credentials': }
 jenkins::plugin { 'scm-api': }
