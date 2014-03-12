@@ -15,9 +15,7 @@ mod "jenkins",
 mod "apt",
   :git => "git://github.com/puppetlabs/puppetlabs-apt.git"
 
-mod "stdlib",
-  :git => "git://github.com/puppetlabs/puppetlabs-stdlib.git"
-
+mod 'puppetlabs/stdlib'
 mod 'puppetlabs/git'
 
 mod 'erikwebb/drush'

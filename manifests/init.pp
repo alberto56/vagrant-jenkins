@@ -73,7 +73,7 @@ php::ini { '/etc/php.ini':
 }
 include php::cli
 # see https://drupal.org/node/881098 for xml
-php::module { [ 'mbstring', 'apc', 'pdo', 'gd', 'xml' ]: }
+php::module { [ 'mbstring', 'apc', 'pdo', 'mysql', 'gd', 'xml' ]: }
 class { 'php::mod_php5': inifile => '/etc/php.ini' }
 
 # See https://ask.puppetlabs.com/question/3516
