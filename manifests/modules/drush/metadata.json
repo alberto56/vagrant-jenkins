@@ -1,0 +1,26 @@
+{
+  "description": "A Puppet module to install and execute Drupal commands using Drush.",
+  "types": [
+
+  ],
+  "author": "erikwebb",
+  "source": "git://github.com/erikwebb/erikwebb-drush.git",
+  "checksums": {
+    "Modulefile": "c5b6269516ab2845b2d3e09417ea256a",
+    "manifests/exec.pp": "478b9488e9ff7c07278a75c6ba922637",
+    "tests/init.pp": "3f7e38e4443a848eff3882cf85245efe",
+    "spec/spec_helper.rb": "a55d1e6483344f8ec6963fcb2c220372",
+    "README.md": "75588e9962c33e701319e12bb53b07d4",
+    "manifests/init.pp": "4456b86c6d6ed35b1af5ec5d00a2e10d"
+  },
+  "version": "0.0.2",
+  "name": "erikwebb-drush",
+  "dependencies": [
+    {
+      "name": "rafaelfc/pear"
+    }
+  ],
+  "project_page": "http://github.com/erikwebb/erikwebb-drush",
+  "summary": "Drush Puppet Module",
+  "license": "Apache License, Version 2.0"
+}

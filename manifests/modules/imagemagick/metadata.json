@@ -1,0 +1,24 @@
+{
+  "name": "scarcemedia/imagemagick",
+  "version": "0.0.1",
+  "source": "https://github.com/scarcemedia/puppet-imagemagick",
+  "author": "scarcemedia",
+  "license": "Apache License, Version 2.0",
+  "summary": "Module is used to install the imagemagick package.",
+  "description": "Module is used to install the imagemagick package.",
+  "project_page": "https://github.com/scarcemedia/puppet-imagemagick",
+  "dependencies": [
+
+  ],
+  "types": [
+
+  ],
+  "checksums": {
+    "Modulefile": "f3307379b11349ab24de60edc75b4233",
+    "README.md": "9cbb9ddc6be7e4e91785dea147f674db",
+    "manifests/init.pp": "837b96b3b8c438f10cecf05c77f4e85f",
+    "manifests/params.pp": "542cb73ec7e7bdb9bacc53b90a776391",
+    "spec/spec_helper.rb": "a55d1e6483344f8ec6963fcb2c220372",
+    "tests/init.pp": "9c04b4f0c0a766906ec54b962cd65552"
+  }
+}
