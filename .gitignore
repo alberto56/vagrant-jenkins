@@ -3,4 +3,3 @@
 manifests/.librarian
 manifests/.tmp
 manifests/*lock
-manifests/modules

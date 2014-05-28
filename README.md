@@ -53,6 +53,9 @@ Now, I downloaded my [Vagrant-Puppet scripts](https://github.com/alberto56/vagra
     yum install git
     git clone https://github.com/alberto56/vagrant-jenkins.git
     cd ~/vagrant-jenkins/manifests/
+    yum install ruby
+    yum install rubygems
+    gem install puppet
     gem install librarian-puppet
     librarian-puppet install
 
