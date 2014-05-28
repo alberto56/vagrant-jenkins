@@ -77,8 +77,6 @@ To do this:
     # press enter to all following questions
     cat ~/.ssh/id_rsa.pub # this is your public key
 
- * If you are having trouble connecting Jenkins and Git, [read this blog post](http://dcycleproject.org/blog/51).
-
 It is a good idea to change the MySQL root password. You can call this:
 
     mysqladmin -u root -p'CHANGEME' password 'princess'
@@ -91,6 +89,37 @@ If that does not work you might have to follow the instructions [here](http://ww
 
 Note finally that by default Jenkins is not using a password; *you will want to change this if your machine is publicly accessible*.
 
+Setting up a password on Jenkins
+--------------------------------
+
+At first Jenkins has no security, meaning any user can do anything even without being logged in. I have been using Jenkins for years and every time I set up a server I this (*what not to do*):
+
+ * Go to Manage Jenkins > Global security
+ * Check "Logged in users can do anything"
+ * Immediately realize you don't have an account.
+
+To get out of this mess, do the following:
+
+    sudo vi /var/lib/jenkins/config.xml
+
+In that file, find `<useSecurity>true</useSecurity>` and change it to `<useSecurity>false</useSecurity>`. Then type:
+
+    service jenkins restart
+
+Now let's do without locking you out of Jenkins:
+
+ * Go to configureSecurity
+ * Check "Enable security"
+ * Check "Jenkins' own user database"
+ * Check "Allow users to sign up"
+ * Check "Logged in users can do anything"
+ * Save
+ * Click "Create an account"
+ * Username: admin, password: princess
+ * Go back to configureSecurity
+ * Uncheck "Allow users to sign up"
+ * Save
+
 Setting up a Drupal project
 ---------------------------
 
@@ -100,7 +129,7 @@ Visit http://localhost:8082
 
 If your site is accessible publicly, please make sure you have set up security correctly (at least a password!).
 
-Set up your first job, make sure it can connect via SSH to the git repo (see above), and make sure your MySQL root password is changed.
+Set up your first job (Freestyle software project), make sure it can connect via SSH to the git repo (If you are having trouble connecting Jenkins and Git, [read this blog post](http://dcycleproject.org/blog/51)), and make sure your MySQL root password is changed.
 
 Now run your job, and visit the console output.
 
@@ -110,7 +139,7 @@ Note the workspace; it will be something like:
 
 Now, in the command line, log in as the jenkins user (`sudo su -s /bin/bash jenkins`) and `cd` into your workspace.
 
-Create your database and install Drupal:
+Now make sure sites/default/default.settings.php exists (you might have removed it for security reasons), create your database and install Drupal:
 
     echo 'create database mysite'|mysql -uroot -pprincess
     drush si --db-url=mysql://root:princess@localhost/mysite
@@ -148,7 +177,7 @@ Add the following line
 
     127.0.0.1 mysite.jenkins
 
-In your sites/default/settings.php, make sure the base URL is set correctly to be accessible to the VM. So your line will look like:
+Log back in as the Jenkins user, go to your workspace, and in your sites/default/settings.php, make sure the base URL is set correctly to be accessible to the VM. So your line will look like:
 
     $base_url = 'http://mysite.jenkins';  // NO trailing slash!
 
