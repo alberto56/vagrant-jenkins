@@ -5,20 +5,16 @@ By [Albert Albala (alberto56)](https://drupal.org/user/245583).
 
 *A quick, automated way to deploy a Jenkins server tuned specifically for Drupal developers; Uses puppet to configure the server; Can be used with or without vagrant to provision any server (whether or not it's a VM on your local machine). The Jenkins server then created will be able to monitor your Drupal sites' code. Please see [Dcycle project](http://dcycleproject.org) for some best practices.*
 
-This is meant to be used with Vagrant and Virtual Box to set up a Jenkins server running on CentOS 6.x. This has been tested with Mac OS X as a host machine, but it should be possible to run this on any host system which supports Vagrant, VirtualBox, Puppet and Librarian Puppet.
+This is meant to be used with Vagrant and Virtual Box to set up a Jenkins server running on CentOS 6.x. This has been tested with Mac OS X as a host machine, but it should be possible to run this on any host system which supports Vagrant, VirtualBox and Puppet.
 
 For an initial deployment:
 
  * Install *the latest version* of [VirtualBox](https://www.virtualbox.org/wiki/Downloads) on your computer (if your VM fails to boot, especially after upgrading your OS, please upgrade your copy of VirtualBox). For more information see [this issue](https://github.com/alberto56/vagrant-jenkins/issues/11).
  * Install Vagrant on your computer
  * Install Puppet on your computer
- * Install Librarian-Puppet on your computer
 
-Type the following commands, from the root of this directory (`vagrant-jenkins`):
+Type the following command, from the root of this directory (`vagrant-jenkins`):
 
-    cd manifests
-    librarian-puppet install
-    cd ..
     vagrant up
 
 You might have to wait for about an hour while all the relevant files are downloaded. Once the base box is already installed, it will take less time.
@@ -27,9 +23,6 @@ Once your box is running, and assuming no other applications (including other in
 
 For an incremental deployment (if you've already deployed a previous version of this, which you want to update):
 
-    cd manifests
-    librarian-puppet update
-    cd ..
     vagrant reload
     vagrant provision
 
@@ -56,8 +49,6 @@ Now, I downloaded my [Vagrant-Puppet scripts](https://github.com/alberto56/vagra
     yum install ruby
     yum install rubygems
     gem install puppet
-    gem install librarian-puppet
-    librarian-puppet install
 
 Now add the module path to your puppet conf:
 
