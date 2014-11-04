@@ -117,4 +117,18 @@ Vagrant.configure("2") do |config|
     config.ssh.private_key_path = "~/.ssh/id_rsa"
     config.ssh.forward_agent = true
   end
+
+  # See https://www.danpurdy.co.uk/web-development/osx-yosemite-port-forwarding-for-vagrant/
+  # for Mac OS Yosemite 10.10
+  config.trigger.after [:provision, :up, :reload] do
+    system('echo "
+        rdr pass on lo0 inet proto tcp from any to 127.0.0.1 port 8080 -> 127.0.0.1 port 8082
+        rdr pass on lo0 inet proto tcp from any to 127.0.0.1 port 443 -> 127.0.0.1 port 4443
+  " | sudo pfctl -ef - > /dev/null 2>&1; echo "==> Fowarding Ports: 8080 -> 8082 & Enabling pf"')
+  end
+
+  config.trigger.after [:halt, :destroy] do
+    system("sudo pfctl -df /etc/pf.conf > /dev/null 2>&1; echo '==> Removing Port Forwarding & Disabling pf'")
+  end
+
 end
