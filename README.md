@@ -42,7 +42,7 @@ For using a vagrant box on Mac OS 10.10 Yosemite, we are using [this technique](
 Provisioning remote VMs (without Vagrant)
 -----------------------------------------
 
-Now that we have a relatively viable recipe to install Jenkins, I tried provisioning a remote VM hosted on [Digital Ocean](https://www.digitalocean.com). To do that I first created a CentOS VM, and then, on it, I enabled the puppetlabs repo and installed puppet:
+Now that we have a relatively viable recipe to install Jenkins, I tried provisioning a remote VM hosted on [Digital Ocean](https://www.digitalocean.com). To do that I first created a CentOS VM (note: I only tested this with CentOS 6.4 and it is known to _not_ work on CentOS 7), and then, on it, I enabled the puppetlabs repo and installed puppet:
 
     sudo rpm -ivh https://yum.puppetlabs.com/el/6/products/x86_64/puppetlabs-release-6-7.noarch.rpm
     sudo yum install puppet
