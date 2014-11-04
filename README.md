@@ -19,7 +19,7 @@ Type the following command, from the root of this directory (`vagrant-jenkins`):
 
 You might have to wait for about an hour while all the relevant files are downloaded. Once the base box is already installed, it will take less time.
 
-Once your box is running, and assuming no other applications (including other instances of the same box code) use port 8082, you will be able to access the guest's Jenkins at the address http://localhost:8082, and the guest's webserver at http://localhost:8083.
+Once your box is running, and assuming no other applications (including other instances of the same box code) use port 8082, you will be able to access the guest's Jenkins at the address http://localhost:8082, and the guest's webserver at http://localhost:8083. **See "Note to OS X Yosemite 10.10 users", below, if port forwarding is not working on your Yosemite machine.
 
 For an incremental deployment (if you've already deployed a previous version of this, which you want to update):
 
@@ -31,6 +31,13 @@ You might need to follow further instructions on-screen.
 You can then log into your box:
 
     vagrant ssh
+
+Note to OS X Yosemite 10.10 users
+---------------------------------
+
+For using a vagrant box on Mac OS 10.10 Yosemite, we are using [this technique](https://www.danpurdy.co.uk/web-development/osx-yosemite-port-forwarding-for-vagrant/) which might require you to install `vagrant-triggers` on your machine:
+
+    vagrant plugin install vagrant-triggers
 
 Provisioning remote VMs (without Vagrant)
 -----------------------------------------
