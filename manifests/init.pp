@@ -37,7 +37,6 @@ file { '/etc/motd':
               Managed by Puppet.\n"
 }
 
-include jenkins
 include git
 include drush
 include imagemagick
@@ -83,11 +82,8 @@ class { 'php::mod_php5': inifile => '/etc/php.ini' }
 class { '::mysql::server':
 }
 
-# don't use a firewall, see http://stackoverflow.com/questions/5984217
-service { iptables:
-    ensure => stopped,
-    hasstatus => "true",
-    status => "true"
+class { 'jenkins':
+  configure_firewall => true
 }
 
 # Install git and dependencies, see
