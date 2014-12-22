@@ -15,7 +15,7 @@ file {'testfile':
 error /(?i)^error /
 
 # match line containing '[error]', case-insensitive
-error /(?i)\[error\]/
+error /(?i)[error]/
 
 # match line beginning with '[Fail]', case-insensitive
 error /(?i)^fail/
@@ -43,8 +43,8 @@ include drush
 include imagemagick
 class { 'apache':
   notify => [
-    exec['clean_urls_for_drupal'],
-    exec['allow_jenkins_virtual_hosts'],
+    Exec['clean_urls_for_drupal'],
+    Exec['allow_jenkins_virtual_hosts'],
   ],
 }
 
@@ -84,7 +84,11 @@ class { '::mysql::server':
 }
 
 # don't use a firewall, see http://stackoverflow.com/questions/5984217
-service { iptables: ensure => stopped }
+service { iptables:
+    ensure => stopped,
+    hasstatus => "true",
+    status => "true"
+}
 
 # Install git and dependencies, see
 # https://github.com/jenkinsci/puppet-jenkins/issues/78
