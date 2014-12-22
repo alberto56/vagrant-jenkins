@@ -15,6 +15,8 @@ mod "jenkins",
 mod "apt",
   :git => "git://github.com/puppetlabs/puppetlabs-apt.git"
 
+mod "puppetlabs/firewall"
+
 mod 'puppetlabs/stdlib'
 mod 'puppetlabs/git'
 
