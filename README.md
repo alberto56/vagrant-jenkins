@@ -94,7 +94,7 @@ In my tests the mysql root password is sometimes empty, in which case the follow
 
 If that does not work you might have to follow the instructions [here](http://www.cyberciti.biz/tips/recover-mysql-root-password.html), using `sudo` for commands which give you an access denied.
 
-Note finally that by default Jenkins is not using a password; *you will want to change this if your machine is publicly accessible*.
+Note finally that by default Jenkins is not using a password; *you will want to change this if your machine is publicly accessible*, here is how:
 
 Setting up a password on Jenkins
 --------------------------------
@@ -126,6 +126,7 @@ Now let's do without locking you out of Jenkins:
  * Go back to configureSecurity
  * Uncheck "Allow users to sign up"
  * Save
+ * At this point anonymous users will _still_ be able to _see_ jobs and artefacts, but not initiate builds or change jobs. If you want anonymous users to be shown a login screen and nothing else, follow [these instructions](http://stackoverflow.com/questions/14226681).
 
 Setting up a Drupal project
 ---------------------------
