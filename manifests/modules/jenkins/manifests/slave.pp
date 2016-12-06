@@ -8,6 +8,9 @@
 #
 # === Parameters
 #
+# [*slave_name*]
+#   Specify the name of the slave.  Not required, by default it will use the fqdn.
+#
 # [*masterurl*]
 #   Specify the URL of the master server.  Not required, the plugin will do a UDP autodiscovery. If specified, the autodiscovery will be skipped.
 #
@@ -62,6 +65,7 @@
 #
 # Copyright 2013 Matthew Barr , but can be used for anything by anyone..
 class jenkins::slave (
+  $slave_name               = undef,
   $masterurl                = undef,
   $ui_user                  = undef,
   $ui_pass                  = undef,
@@ -75,6 +79,7 @@ class jenkins::slave (
   $disable_ssl_verification = false,
   $labels                   = undef,
   $install_java             = $jenkins::params::install_java,
+  $ensure                   = 'running',
   $enable                   = true
 ) inherits jenkins::params {
 
@@ -85,14 +90,6 @@ class jenkins::slave (
     class {'java':
       distribution => 'jdk',
     }
-  }
-
-  #If disable_ssl_verification is set to true
-  if $disable_ssl_verification {
-      #disable SSL verification to the init script
-      $disable_ssl_verification_flag = '-disableSslVerification'
-  } else {
-      $disable_ssl_verification_flag = ''
   }
 
   #add jenkins slave user if necessary.
@@ -118,81 +115,49 @@ class jenkins::slave (
   }
 
   exec { 'get_swarm_client':
-    command      => "wget -O ${slave_home}/${client_jar} ${client_url}/${client_jar}",
-    path         => '/usr/bin:/usr/sbin:/bin:/usr/local/bin',
-    user         => $slave_user,
+    command => "wget -O ${slave_home}/${client_jar} ${client_url}/${client_jar}",
+    path    => '/usr/bin:/usr/sbin:/bin:/usr/local/bin',
+    user    => $slave_user,
     #refreshonly => true,
-    creates      => "${slave_home}/${client_jar}",
+    creates => "${slave_home}/${client_jar}",
     ## needs to be fixed if you create another version..
   }
 
-  if $ui_user {
-    $ui_user_flag = "-username ${ui_user}"
-  }
-  else {$ui_user_flag = ''}
-
-  if $ui_pass {
-    $ui_pass_flag = "-password ${ui_pass}"
-  } else {
-    $ui_pass_flag = ''
-  }
-
-  if $masterurl {
-    $masterurl_flag = "-master ${masterurl}"
-  } else {
-    $masterurl_flag = ''
-  }
-
-  if $labels {
-    $labels_flag = "-labels \"${labels}\""
-  } else {
-    $labels_flag = ''
-  }
-
-  if $slave_home {
-    $fsroot_flag = "-fsroot ${slave_home}"
-  }
-
-  # choose the correct init functions
+  # customizations based on the OS family
   case $::osfamily {
     Debian:  {
-      file { '/etc/init.d/jenkins-slave':
-        ensure  => 'file',
-        mode    => '0700',
-        owner   => 'root',
-        group   => 'root',
-        source  => "puppet:///modules/${module_name}/jenkins-slave",
-        notify  => Service['jenkins-slave'],
-        require => File['/etc/default/jenkins-slave'],
-      }
-
-      file { '/etc/default/jenkins-slave':
-        ensure  => 'file',
-        mode    => '0600',
-        owner   => 'root',
-        group   => 'root',
-        content => template("${module_name}/jenkins-slave-defaults.${::osfamily}"),
-        require => Package['daemon'],
-      }
+      $defaults_location = '/etc/default'
 
       package {'daemon':
         ensure => present,
+        before => Service['jenkins-slave'],
       }
     }
     default: {
-      file { '/etc/init.d/jenkins-slave':
-        ensure  => 'file',
-        mode    => '0700',
-        owner   => 'root',
-        group   => 'root',
-        content => template("${module_name}/jenkins-slave.erb"),
-        notify  => Service['jenkins-slave'],
-      }
+      $defaults_location = '/etc/sysconfig'
     }
   }
 
+  file { '/etc/init.d/jenkins-slave':
+    ensure => 'file',
+    mode   => '0755',
+    owner  => 'root',
+    group  => 'root',
+    source => "puppet:///modules/${module_name}/jenkins-slave.${::osfamily}",
+    notify => Service['jenkins-slave'],
+  }
+
+  file { "${defaults_location}/jenkins-slave":
+    ensure  => 'file',
+    mode    => '0600',
+    owner   => 'root',
+    group   => 'root',
+    content => template("${module_name}/jenkins-slave-defaults.erb"),
+    notify  => Service['jenkins-slave'],
+  }
+
   service { 'jenkins-slave':
-    ensure     => running,
+    ensure     => $ensure,
     enable     => $enable,
     hasstatus  => true,
     hasrestart => true,

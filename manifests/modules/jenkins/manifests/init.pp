@@ -2,6 +2,7 @@
 
 # version = 'installed' (Default)
 #   Will NOT update jenkins to the most recent version.
+#
 # version = 'latest'
 #    Will automatically update the version of jenkins to the current version available via your package manager.
 #
@@ -11,6 +12,9 @@
 # lts = true
 #   Use LTS verison of jenkins
 #
+# port = 8080 (default)
+#   Sets firewall port to 8080 if puppetlabs-firewall module is installed
+#
 # repo = true (Default)
 #   install the jenkins repo.
 #
@@ -19,16 +23,22 @@
 #   this module.
 #   This is for folks that use a custom repo, or the like.
 #
+# service_enable = true (default)
+#   Enable (or not) the jenkins service
+#
+# service_ensure = 'running' (default)
+#   Status of the jenkins service.  running, stopped
+#
 # config_hash = undef (Default)
-# Hash with config options to set in sysconfig/jenkins defaults/jenkins
+#   Hash with config options to set in sysconfig/jenkins defaults/jenkins
 #
 # Example use
 #
-# class{ 'jenkins::config':
+# class{ 'jenkins':
 #   config_hash => {
 #     'HTTP_PORT' => { 'value' => '9090' }, 'AJP_PORT' => { 'value' => '9009' }
 #   }
-# }
+# V
 #
 # plugin_hash = undef (Default)
 # Hash with config plugins to install
@@ -37,7 +47,7 @@
 #
 # class{ 'jenkins::plugins':
 #   plugin_hash => {
-#     'git' -> { version => '1.1.1' },
+#     'git' => { version => '1.1.1' },
 #     'parameterized-trigger' => {},
 #     'multiple-scms' => {},
 #     'git-client' => {},
@@ -68,6 +78,25 @@
 #   - use puppetlabs-java module to install the correct version of a JDK.
 #   - Jenkins requires a JRE
 #
+#
+# cli = false (default)
+#   - force installation of the jenkins CLI jar to $libdir/cli/jenkins-cli.jar
+#   - the cli is automatically installed when needed by components that use it,
+#     such as the user and credentials types, and the security class
+#   - CLI installation (both implicit and explicit) requires the unzip command
+#
+#
+# proxy_host = undef (default)
+# proxy_port = undef (default)
+#   If your environment requires a proxy host to download plugins it can be configured here
+#
+#
+# no_proxy_list = undef (default)
+#   List of hostname patterns to skip using the proxy.
+#   - Accepts input as array only.
+#   - Only effective if "proxy_host" and "proxy_port" are set.
+#
+#
 class jenkins(
   $version            = $jenkins::params::version,
   $lts                = $jenkins::params::lts,
@@ -76,11 +105,15 @@ class jenkins(
   $service_ensure     = $jenkins::params::service_ensure,
   $config_hash        = {},
   $plugin_hash        = {},
+  $job_hash           = {},
   $configure_firewall = undef,
   $install_java       = $jenkins::params::install_java,
   $proxy_host         = undef,
   $proxy_port         = undef,
+  $no_proxy_list      = undef,
   $cli                = undef,
+  $port               = $jenkins::params::port,
+  $libdir             = $jenkins::params::libdir,
 ) inherits jenkins::params {
 
   validate_bool($lts, $install_java, $repo)
@@ -88,6 +121,10 @@ class jenkins(
 
   if $configure_firewall {
     validate_bool($configure_firewall)
+  }
+
+  if $no_proxy_list {
+    validate_array($no_proxy_list)
   }
 
   anchor {'jenkins::begin':}
@@ -100,14 +137,13 @@ class jenkins(
   }
 
   if $repo {
-    class {'jenkins::repo':}
+    include jenkins::repo
   }
 
-  class {'jenkins::package': }
-
-  class { 'jenkins::config': }
-
-  class { 'jenkins::plugins': }
+  include jenkins::package
+  include jenkins::config
+  include jenkins::plugins
+  include jenkins::jobs
 
   if $proxy_host and $proxy_port {
     class { 'jenkins::proxy':
@@ -116,25 +152,35 @@ class jenkins(
     }
   }
 
-  class {'jenkins::service':}
+  include jenkins::service
 
   if defined('::firewall') {
     if $configure_firewall == undef {
       fail('The firewall module is included in your manifests, please configure $configure_firewall in the jenkins module')
     } elsif $configure_firewall {
-      class {'jenkins::firewall':}
+      include jenkins::firewall
     }
   }
+
   if $cli {
-    class {'jenkins::cli':}
+    include jenkins::cli
   }
 
   Anchor['jenkins::begin'] ->
     Class['jenkins::package'] ->
       Class['jenkins::config'] ->
-        Class['jenkins::plugins']~>
+        Class['jenkins::plugins'] ~>
           Class['jenkins::service'] ->
+            Class['jenkins::jobs'] ->
               Anchor['jenkins::end']
+
+  if $cli {
+    Anchor['jenkins::begin'] ->
+      Class['jenkins::service'] ->
+        Class['jenkins::cli'] ->
+          Class['jenkins::jobs'] ->
+            Anchor['jenkins::end']
+  }
 
   if $install_java {
     Anchor['jenkins::begin'] ->
